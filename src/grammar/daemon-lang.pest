@@ -1,0 +1,24 @@
+line = { (label ~ space+)? ~ instruction ~ space* ~ NEWLINE? | NEWLINE }
+
+label = { (ASCII_ALPHANUMERIC | "_")+ ~ ":" }
+
+// Matches to an opcode followed by mandatory whitespace,
+// then two fields separated by a comma and possibly whitespace.
+instruction = { opcode ~ size? ~ space+ ~ field ~ "," ~ space* ~ field }
+
+size        = { "." ~ ASCII_DIGIT }
+opcode      = { ASCII_ALPHA+ }
+
+field       = { immediate | direct | indirect | ip }
+immediate   = { "$" ~ address }
+// Direct is the "default" if no prefix is given
+direct      = { "@" ~ address | address }
+indirect    = { "!" ~ address }
+ip          = { "%ip" }
+
+address     = { hex_address | dec_address }
+hex_address = { "-"? ~ "0x" ~ ASCII_HEX_DIGIT+ }
+dec_address = { "-"? ~ ASCII_DIGIT+ }
+
+// My own whitespace rule, since I want more control over how it's used
+space       = _{ " " | "\t" }
